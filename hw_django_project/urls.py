@@ -24,19 +24,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('', include('first_app.urls')),
 
-    #api for task
-    # Задание 1
-    path('tasks/create/', task_views.task_create, name='task-create'),
-
-    # Задание 2
-    path('tasks/', task_views.task_list, name='task-list'),
-    path('tasks/<int:pk>/', task_views.task_detail, name='task-detail'),
-
-    # Задание 3
-    path('tasks/stats/', task_views.task_stats, name='task-stats'),
-    # просто дополнительно сделал
-    path('tasks/<int:pk>/update/', task_views.task_update, name='task-update'),
-    path('tasks/<int:pk>/delete/', task_views.task_delete, name='task-delete'),
+    path('api/v1/', include('task_manager.urls', namespace='task_manager')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
