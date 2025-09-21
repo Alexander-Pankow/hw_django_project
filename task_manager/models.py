@@ -31,7 +31,7 @@ class Task(models.Model):
 
     """Задача для выполнения."""
 
-    title = models.CharField(unique_for_date='created_at',max_length=100,verbose_name='Название задачи')
+    title = models.CharField(max_length=100,verbose_name='Название задачи')
     description = models.TextField(blank=True,verbose_name='Описание задачи')
     categories = models.ManyToManyField(Category, related_name='tasks',verbose_name='Категории задачи')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='New',verbose_name=' Статус задачи')

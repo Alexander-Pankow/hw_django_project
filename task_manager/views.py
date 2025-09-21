@@ -1,11 +1,13 @@
+from django.db.models.functions import ExtractWeekDay
 from rest_framework.decorators import api_view
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils.timezone import now
 from django.db.models import Count
 from .models import Task,SubTask
-from .serializers import TaskSerializer,SubTaskCreateSerializer
+from .serializers import TaskSerializer,SubTaskCreateSerializer,SubTaskSerializer
 
 
 
@@ -151,3 +153,104 @@ class SubTaskDetailUpdateDeleteView(APIView):
             return Response({"error": "SubTask not found"}, status=status.HTTP_404_NOT_FOUND)
         subtask.delete()
         return Response({"message": "Deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+class TaskListView(APIView):
+
+    def get(self, request):
+        """
+            HW14
+        Задание 1:
+    Написать, или обновить, если уже есть, эндпоинт на получение списка всех задач по дню недели.
+    Если никакой параметр запроса не передавался - по умолчанию выводить все записи.
+    Если был передан день недели (например вторник) - выводить список задач только на этот день недели.
+        """
+        deadline = request.query_params.get('deadline', None)
+
+        if deadline is not None:
+            try:
+                weekday = int(deadline)
+                res = Task.objects.annotate(
+                    weekday=ExtractWeekDay('deadline')
+                ).filter(weekday=weekday)
+            except ValueError:
+                return Response(
+                    {"error": "Deadline must be a number (1=Sunday, 2=Monday, ...7=Saturday)"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            res = Task.objects.all()
+
+        serializer = TaskSerializer(res, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
+class SubTaskListView(APIView, PageNumberPagination):
+    page_size = 5
+
+    def get(self, request):
+        """
+            HW14
+        Задание 2:
+            Добавить пагинацию в отображение списка подзадач.
+            На одну страницу должно отображаться не более 5 объектов.
+            Отображение объектов должно идти в порядке убывания даты
+            (от самого последнего добавленного объекта к самому первому)
+        """
+        subtasks = SubTask.objects.all().order_by('-created_at')  # сортировка по убыванию даты создания
+        self.page_size = self.get_page_size(request)              # проверка параметра page_size (если захотим поменять через запрос)
+        result = self.paginate_queryset(subtasks, request, view=self) # применяем пагинацию
+        serializer = SubTaskSerializer(result, many=True)             # сериализация данных
+        return self.get_paginated_response(serializer.data)
+
+    def get_page_size(self, request):
+        """
+            Если в запросе есть параметр page_size и он число — используем его,
+            иначе оставляем значение по умолчанию (5).
+        """
+        page_size = request.query_params.get('page_size', None)
+        if page_size and page_size.isdigit():
+            return int(page_size)
+        return self.page_size
+
+
+class SubTaskFilterListView(APIView, PageNumberPagination):
+    page_size = 5  # максимум 5 подзадач на страницу
+
+    def get(self, request):
+        """
+        HW14
+        Задание 3:
+    Добавить или обновить, если уже есть, эндпоинт на получение списка всех подзадач по названию главной задачи и статусу подзадач.
+    Если фильтр параметры в запросе не передавались - выводить данные по умолчанию, с учётом пагинации.
+    Если бы передан фильтр параметр названия главной задачи - выводить данные по этой главной задаче.
+    Если был передан фильтр параметр конкретного статуса подзадачи - выводить данные по этому статусу.
+    Если были переданы оба фильтра - выводить данные в соответствии с этими фильтрами.
+        """
+
+
+        subtasks = SubTask.objects.all().order_by('-created_at')             # берем все подзадачи
+
+        task_title = request.query_params.get('task_title', None)  # достаем параметры фильтра из запроса
+        status_filter = request.query_params.get('status', None)
+
+
+        if task_title:
+            subtasks = subtasks.filter(task__title__icontains=task_title)  # если фильтры есть — применяем
+                                                                           # __icontains = поиск по подстроке (чтобы не зависело от регистра)
+        if status_filter:
+            subtasks = subtasks.filter(status=status_filter)
+
+        self.page_size = self.get_page_size(request)                         # пагинация
+        result = self.paginate_queryset(subtasks, request, view=self)
+
+        serializer = SubTaskSerializer(result, many=True)                    # сериализация
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def get_page_size(self, request):
+        """Поддержка изменения размера страницы через параметр ?page_size=N"""
+        page_size = request.query_params.get('page_size', None)
+        if page_size and page_size.isdigit():
+            return int(page_size)
+        return self.page_size
