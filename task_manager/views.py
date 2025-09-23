@@ -1,4 +1,7 @@
 from django.db.models.functions import ExtractWeekDay
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
@@ -254,3 +257,60 @@ class SubTaskFilterListView(APIView, PageNumberPagination):
         if page_size and page_size.isdigit():
             return int(page_size)
         return self.page_size
+
+"""
+HW15
+Задание 1: Замена представлений для задач (Tasks) на Generic Views
+Шаги для выполнения:
+Замените классы представлений для задач на Generic Views:
+Используйте ListCreateAPIView для создания и получения списка задач.
+Используйте RetrieveUpdateDestroyAPIView для получения, обновления и удаления задач.
+Реализуйте фильтрацию, поиск и сортировку:
+Реализуйте фильтрацию по полям status и deadline.
+Реализуйте поиск по полям title и description.
+Добавьте сортировку по полю created_at.
+"""
+# Список + создание задач
+class TaskListCreateView(ListCreateAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['status', 'deadline']           # фильтрация
+    search_fields = ['title', 'description']            # поиск
+    ordering_fields = ['created_at']                    # сортировка
+
+
+# Детали, обновление, удаление задачи
+class TaskDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+
+"""
+HW15
+Задание 2: Замена представлений для подзадач (SubTasks) на Generic Views
+Шаги для выполнения:
+Замените классы представлений для подзадач на Generic Views:
+Используйте ListCreateAPIView для создания и получения списка подзадач.
+Используйте RetrieveUpdateDestroyAPIView для получения, обновления и удаления подзадач.
+Реализуйте фильтрацию, поиск и сортировку:
+Реализуйте фильтрацию по полям status и deadline.
+Реализуйте поиск по полям title и description.
+Добавьте сортировку по полю created_at.
+"""
+
+# Список + создание подзадач
+class SubTaskListCreateView(ListCreateAPIView):
+    queryset = SubTask.objects.all()
+    serializer_class = SubTaskSerializer
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['status', 'deadline']           # фильтрация
+    search_fields = ['title', 'description']            # поиск
+    ordering_fields = ['created_at']                    # сортировка
+
+
+# Детали, обновление, удаление подзадачи
+class SubTaskDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = SubTask.objects.all()
+    serializer_class = SubTaskSerializer

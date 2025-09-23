@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "first_app.apps.FirstAppConfig",
     "rest_framework",
+    'django_filters',
     "task_manager.apps.TaskManagerConfig"
 ]
 

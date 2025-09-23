@@ -1,31 +1,34 @@
 
 from django.urls import path
-from task_manager.views import (task_create,task_list,task_detail,task_stats,task_update,task_delete,SubTaskListCreateView, SubTaskDetailUpdateDeleteView,
-                                TaskListView,SubTaskListView,SubTaskFilterListView)
+from task_manager.views import (task_create,task_list,task_detail,task_stats,task_update,task_delete
+                                ,SubTaskListCreateView, SubTaskDetailUpdateDeleteView,
+                                TaskListView,SubTaskListView, SubTaskFilterListView,TaskListCreateView, TaskDetailView,
+                                SubTaskListCreateView, SubTaskDetailView
+                                    )
 
 app_name = "task_manager"
 
 urlpatterns = [
     # api for task
     # Задание 1 api for task
-    path('tasks/create/', task_create, name='task-create'),
+    #path('tasks/create/', task_create, name='task-create'),
 
     # Задание 2
     #path('tasks/', task_list, name='task-list'),
     #path('tasks/<int:pk>/', task_detail, name='task-detail'),
 
     # Задание 3
-    path('tasks/stats/', task_stats, name='task-stats'),
+    #path('tasks/stats/', task_stats, name='task-stats'),
 
     #path("subtasks/", SubTaskListCreateView.as_view(), name="subtask-list-create"),
     #path("subtasks/<int:pk>/", SubTaskDetailUpdateDeleteView.as_view(), name="subtask-detail-update-delete"),
 
     # просто дополнительно сделал
-    path('tasks/<int:pk>/update/', task_update, name='task-update'),
-    path('tasks/<int:pk>/delete/', task_delete, name='task-delete'),
+    #path('tasks/<int:pk>/update/', task_update, name='task-update'),
+    #path('tasks/<int:pk>/delete/', task_delete, name='task-delete'),
 
     # HW14 Задание 1 http://127.0.0.1:8000/api/v1/tasks/?deadline=4 запуск
-    path('tasks/', TaskListView.as_view(), name='TaskListView'),
+    #path('tasks/', TaskListView.as_view(), name='TaskListView'),
 
     #HW14 Задание 2 GET http://127.0.0.1:8000/api/v1/subtasks/ → вернёт первые 5 подзадач
     #               GET http://127.0.0.1:8000/api/v1/subtasks/?page=2 → вернёт следующие 5
@@ -36,5 +39,22 @@ urlpatterns = [
     #               GET http://127.0.0.1:8000/api/v1/subtasks/?task_title=Домашнее задание, Подзадачи только для задачи "Домашнее задание":
     #               GET http://127.0.0.1:8000/api/v1/subtasks/?status=In progress, Подзадачи только со статусом "In progress":
     #               GET http://127.0.0.1:8000/api/v1/subtasks/?task_title=Проект&status=Done, Подзадачи для задачи "Проект" со статусом "Done":
-    path('subtasks/', SubTaskFilterListView.as_view(), name='subtask-list'),
+    #path('subtasks/', SubTaskFilterListView.as_view(), name='subtask-list'),
+
+
+    # HW15
+
+    path('tasks/', TaskListCreateView.as_view(), name='task-list-create'),
+    path('tasks/<int:pk>/', TaskDetailView.as_view(), name='task-detail'),
+
+    path('subtasks/', SubTaskListCreateView.as_view(), name='subtask-list-create'),
+    path('subtasks/<int:pk>/', SubTaskDetailView.as_view(), name='subtask-detail'),
+    # GET /tasks/ → список
+    # POST /tasks/ → создать
+    # GET /tasks/1/ → одна задача
+    # PUT/PATCH /tasks/1/ → обновить
+    # DELETE /tasks/1/ → удалить
+    # Фильтрация: ?status=Done&deadline=2025-09-23
+    # Поиск: ?search=important
+    # Сортировка: ?ordering=created_at или ?ordering=-created_at
 ]
