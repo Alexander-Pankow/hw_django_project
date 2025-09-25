@@ -20,11 +20,21 @@ from django.urls import path, include
 from task_manager import views as task_views
 from hw_django_project import settings
 from django.conf.urls.static import static
+from task_manager.views import  CategoryViewSet
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()   #HW16
+router.register(r'categories', CategoryViewSet, basename='category') #HW16
+
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('', include('first_app.urls')),
 
-    path('api/v1/', include('task_manager.urls', namespace='task_manager')),
+    #path('api/v1/', include('task_manager.urls', namespace='task_manager')),
+
+    #HW16
+    path('api/v1/', include(router.urls)),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

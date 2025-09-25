@@ -1,7 +1,20 @@
 from django.utils.timezone import now
+from rest_framework import serializers
 from rest_framework.fields import DateTimeField
 from rest_framework.serializers import ModelSerializer,ValidationError
 from task_manager.models import Task,SubTask,Category
+
+
+#HW16
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'is_deleted', 'deleted_at']
+        read_only_fields = ['is_deleted', 'deleted_at']
+
+
+
 
 class TaskSerializer(ModelSerializer):
         class Meta:

@@ -1,5 +1,6 @@
 
 from django.urls import path
+from rest_framework.routers import DefaultRouter
 from task_manager.views import (task_create,task_list,task_detail,task_stats,task_update,task_delete
                                 ,SubTaskListCreateView, SubTaskDetailUpdateDeleteView,
                                 TaskListView,SubTaskListView, SubTaskFilterListView,TaskListCreateView, TaskDetailView,
@@ -7,6 +8,8 @@ from task_manager.views import (task_create,task_list,task_detail,task_stats,tas
                                     )
 
 app_name = "task_manager"
+
+
 
 urlpatterns = [
     # api for task
@@ -57,4 +60,7 @@ urlpatterns = [
     # Фильтрация: ?status=Done&deadline=2025-09-23
     # Поиск: ?search=important
     # Сортировка: ?ordering=created_at или ?ordering=-created_at
+
+
+
 ]

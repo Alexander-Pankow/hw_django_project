@@ -1,16 +1,30 @@
 from django.db.models.functions import ExtractWeekDay
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework import filters
+from rest_framework import filters,viewsets
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils.timezone import now
 from django.db.models import Count
-from .models import Task,SubTask
-from .serializers import TaskSerializer,SubTaskCreateSerializer,SubTaskSerializer
+from .models import Task,SubTask,Category
+from .serializers import TaskSerializer,SubTaskCreateSerializer,SubTaskSerializer,CategorySerializer
+
+#HW16
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()  # по умолчанию только активные
+    serializer_class = CategorySerializer
+
+    @action(detail=True, methods=['get'])
+    def count_tasks(self, request, pk=None):
+        """Подсчёт задач в категории"""
+        category = self.get_object()
+        count = category.tasks.count()  # related_name='tasks' в Task
+        return Response({'category': category.name, 'tasks_count': count})
+
 
 
 
