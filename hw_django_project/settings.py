@@ -12,10 +12,17 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from environ import Env
+from datetime import timedelta
 import os
 
-#HW17
+#HW17 - 18
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # по умолчанию всё защищено
+    ],
     "DEFAULT_FILTER_BACKENDS": [
         "rest_framework.filters.OrderingFilter",
     ],
@@ -24,6 +31,10 @@ REST_FRAMEWORK = {
     "DEFAULT_ORDERING": "name",  # <-- вместо несуществующего "created"
 }
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,7 +56,9 @@ INSTALLED_APPS = [
     "first_app.apps.FirstAppConfig",
     "rest_framework",
     'django_filters',
-    "task_manager.apps.TaskManagerConfig"
+    "task_manager.apps.TaskManagerConfig",
+    "rest_framework.authtoken",
+    "rest_framework_simplejwt",
 ]
 
 MIDDLEWARE = [

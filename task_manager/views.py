@@ -1,3 +1,6 @@
+from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly
+from rest_framework.viewsets import ModelViewSet
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.db.models.functions import ExtractWeekDay
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework import filters,viewsets
@@ -17,6 +20,8 @@ from .serializers import TaskSerializer,SubTaskCreateSerializer,SubTaskSerialize
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()  # по умолчанию только активные
     serializer_class = CategorySerializer
+    permission_classes = [IsAdminUser]
+    authentication_classes = [JWTAuthentication]
 
     @action(detail=True, methods=['get'])
     def count_tasks(self, request, pk=None):
@@ -288,6 +293,8 @@ HW15
 class TaskListCreateView(ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [JWTAuthentication]
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'deadline']           # фильтрация
@@ -299,7 +306,8 @@ class TaskListCreateView(ListCreateAPIView):
 class TaskDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [JWTAuthentication]
 """
 HW15
 Задание 2: Замена представлений для подзадач (SubTasks) на Generic Views
@@ -317,6 +325,8 @@ HW15
 class SubTaskListCreateView(ListCreateAPIView):
     queryset = SubTask.objects.all()
     serializer_class = SubTaskSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [JWTAuthentication]
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'deadline']           # фильтрация
@@ -328,3 +338,5 @@ class SubTaskListCreateView(ListCreateAPIView):
 class SubTaskDetailView(RetrieveUpdateDestroyAPIView):
     queryset = SubTask.objects.all()
     serializer_class = SubTaskSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [JWTAuthentication]
