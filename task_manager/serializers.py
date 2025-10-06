@@ -17,19 +17,25 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(ModelSerializer):
+        owner = serializers.ReadOnlyField(source='owner.username')  # только чтение
+
         class Meta:
             model = Task
-            fields = ['id', 'title', 'description', 'status', 'deadline', 'created_at']
+            fields = "__all__"
 
 
 # Задание 1: SubTaskCreateSerializer
 
 class SubTaskCreateSerializer(ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')  # только чтение
     created_at = DateTimeField(read_only=True) # не совсем понимаю
 
     class Meta:
         model = SubTask
-        fields = "__all__"
+        fields = [
+            'id', 'title', 'description', 'task',
+            'status', 'deadline', 'created_at', 'owner'
+        ]
 
 
 # Задание 2: CategoryCreateSerializer

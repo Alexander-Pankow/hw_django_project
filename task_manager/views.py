@@ -1,9 +1,9 @@
 from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly
-from rest_framework.viewsets import ModelViewSet
+from .permissions import IsOwnerOrReadOnly
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.db.models.functions import ExtractWeekDay
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework import filters,viewsets
+from rest_framework import filters, viewsets, permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view, action
 from rest_framework.pagination import PageNumberPagination
@@ -293,14 +293,20 @@ HW15
 class TaskListCreateView(ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
     authentication_classes = [JWTAuthentication]
 
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['status', 'deadline']           # фильтрация
-    search_fields = ['title', 'description']            # поиск
-    ordering_fields = ['created_at']                    # сортировка
+    # filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    # filterset_fields = ['status', 'deadline']           # фильтрация
+    # search_fields = ['title', 'description']            # поиск
+    # ordering_fields = ['created_at']                    # сортировка
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)  # автоматически проставляем владельца
+
+    def get_queryset(self):
+        # фильтруем только свои задачи
+        return Task.objects.filter(owner=self.request.user)
 
 # Детали, обновление, удаление задачи
 class TaskDetailView(RetrieveUpdateDestroyAPIView):
@@ -325,14 +331,19 @@ HW15
 class SubTaskListCreateView(ListCreateAPIView):
     queryset = SubTask.objects.all()
     serializer_class = SubTaskSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
     authentication_classes = [JWTAuthentication]
 
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['status', 'deadline']           # фильтрация
-    search_fields = ['title', 'description']            # поиск
-    ordering_fields = ['created_at']                    # сортировка
+    # filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    # filterset_fields = ['status', 'deadline']           # фильтрация
+    # search_fields = ['title', 'description']            # поиск
+    # ordering_fields = ['created_at']                    # сортировка
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+    def get_queryset(self):
+        return SubTask.objects.filter(owner=self.request.user)
 
 # Детали, обновление, удаление подзадачи
 class SubTaskDetailView(RetrieveUpdateDestroyAPIView):

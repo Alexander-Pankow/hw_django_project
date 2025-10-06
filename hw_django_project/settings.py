@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "task_manager.apps.TaskManagerConfig",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [

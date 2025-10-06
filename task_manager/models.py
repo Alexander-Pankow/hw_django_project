@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 # from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now
@@ -84,6 +85,8 @@ class Task(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='New',verbose_name=' Статус задачи')
     deadline = models.DateTimeField(verbose_name='Дата и время дедлайн')
     created_at = models.DateTimeField(auto_now_add=True,verbose_name='Дата и время создания')
+    # HW 19 новое поле — владелец задачи
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='tasks',verbose_name='Владелец')
 
     def __str__(self):
         return self.title
@@ -106,6 +109,8 @@ class SubTask(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='New',verbose_name='Статус задачи')
     deadline = models.DateTimeField(verbose_name='Дата и время дедлайн')
     created_at = models.DateTimeField(auto_now_add=True,verbose_name='Дата и время создания')
+    # HW19 новое поле владелец (тот же, кто создал основную задачу)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='subtasks',verbose_name='Владелец')
 
     def __str__(self):
         return f"{self.title} ({self.task.title})"
