@@ -1,7 +1,8 @@
 
 from django.urls import path
 from rest_framework.routers import DefaultRouter
-from task_manager.views import (task_create,task_list,task_detail,task_stats,task_update,task_delete
+from task_manager.views import (RegisterView, LoginView, LogoutView,
+                                task_create,task_list,task_detail,task_stats,task_update,task_delete
                                 ,SubTaskListCreateView, SubTaskDetailUpdateDeleteView,
                                 TaskListView,SubTaskListView, SubTaskFilterListView,TaskListCreateView, TaskDetailView,
                                 SubTaskListCreateView, SubTaskDetailView
@@ -61,6 +62,10 @@ urlpatterns = [
     # Поиск: ?search=important
     # Сортировка: ?ordering=created_at или ?ordering=-created_at
 
+    #HW20
+    path('auth/register/', RegisterView.as_view(), name='register'),
+    path('auth/login/', LoginView.as_view(), name='login'),
+    path('auth/logout/', LogoutView.as_view(), name='logout'),
 
 
 ]

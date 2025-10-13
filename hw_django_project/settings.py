@@ -33,8 +33,15 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+# --- Для отправки почты в консоль (тестовый backend) ---
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'no-reply@example.com'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -59,7 +66,8 @@ INSTALLED_APPS = [
     "task_manager.apps.TaskManagerConfig",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
-    'drf_yasg',
+    'drf_yasg', # Swagger
+    'rest_framework_simplejwt.token_blacklist',  # для blacklist refresh токенов
 ]
 
 MIDDLEWARE = [

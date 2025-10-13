@@ -88,6 +88,9 @@ class Task(models.Model):
     # HW 19 новое поле — владелец задачи
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='tasks',verbose_name='Владелец')
 
+    #HW 20 поле для хранения статуса, по которому последний раз уже было уведомление
+    last_notified_status = models.CharField(max_length=50, null=True, blank=True)
+
     def __str__(self):
         return self.title
 

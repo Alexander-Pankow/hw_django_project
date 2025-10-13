@@ -3,6 +3,57 @@ from rest_framework import serializers
 from rest_framework.fields import DateTimeField
 from rest_framework.serializers import ModelSerializer,ValidationError
 from task_manager.models import Task,SubTask,Category
+from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+
+User = get_user_model()
+
+#HW 20
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    email = serializers.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('id','username','email','password')
+
+    def validate_email(self, value):
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("User with this email already exists.")
+        return value
+
+    def validate_password(self, value):
+        validate_password(value)  # использует настройки Django validators
+        return value
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data.get('email',''),
+            password=validated_data['password']
+        )
+        return user
+
+
+class TaskSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+
+    class Meta:
+        model = Task
+        fields = '__all__'
+        read_only_fields = ['owner', 'created_at', 'last_notified_status']
+
+
+class SubTaskSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+
+    class Meta:
+        model = SubTask
+        fields = '__all__'
+        read_only_fields = ['owner', 'created_at']
+
+
 
 
 #HW16
