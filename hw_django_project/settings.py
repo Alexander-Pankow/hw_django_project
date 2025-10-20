@@ -99,6 +99,7 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = "hw_django_project.wsgi.application"
 
 
